@@ -124,7 +124,7 @@ function cancelarPlano(alunoId: number): IResultadoCancelamento {
     }
     const hoje = new Date();
     if (aluno.vencimento <= hoje) {
-        return { multa: 0, ehValido: false }; // já venceu, talvez sem multa, mas regras dizem multa se antes do prazo
+        return { multa: 0, ehValido: false };
     }
     const diffTime = aluno.vencimento.getTime() - hoje.getTime();
     const diffDays = diffTime / (1000 * 3600 * 24);

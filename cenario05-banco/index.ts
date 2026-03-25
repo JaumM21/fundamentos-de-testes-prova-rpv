@@ -57,35 +57,93 @@ const contas: IConta[] = [
 // ==================== FUNÇÕES A IMPLEMENTAR ====================
 
 function depositar(dados: IDepositar): boolean {
-    const conta = contas.find(c => c.id === dados.contaId);
-    if (!conta || !conta.ativa) return false;
-    if (dados.valor < 10) return false;
-    conta.saldo += dados.valor;
-    conta.extrato.push({ tipo: 'deposito', valor: dados.valor, data: new Date() });
-    return true;
+    // TODO: Implementar a lógica seguindo as regras de negócio
+    //
+    // Passos sugeridos:
+
+    // 1. Buscar a conta pelo contaId
+    const conta = contas.find(c => c.id === dados.contaId)
+
+    // 2. Verificar se a conta existe e está ativa
+    if (!conta || !conta.ativa) {
+        return false
+    }
+
+    // 3. Verificar se o valor é >= R$ 10,00
+    if (dados.valor < 10) {
+        return false
+    }
+
+    // 4. Adicionar o valor ao saldo da conta
+    conta.saldo += dados.valor
+
+    // 5. Registrar a movimentação no extrato
+    conta.extrato.push({
+        tipo: 'deposito',
+        valor: dados.valor,
+        data: new Date()
+    })
+
+    return true
+
 }
 
 function sacar(dados: ISacar): boolean {
-    const conta = contas.find(c => c.id === dados.contaId);
-    if (!conta || !conta.ativa) return false;
-    if (dados.valor > conta.saldo) return false;
-    conta.saldo -= dados.valor;
-    conta.extrato.push({ tipo: 'saque', valor: dados.valor, data: new Date() });
-    return true;
+    // TODO: Implementar a lógica seguindo as regras de negócio
+    //
+    // Passos sugeridos:
+    
+    // 1. Buscar a conta
+    const conta = contas.find(c => c.id === dados.contaId)
+ 
+    // 2. Verificar se existe e está ativa
+    if (!conta || !conta.ativa) return false
+ 
+    // 3. Verificar se tem saldo suficiente
+    if (dados.valor > conta.saldo) return false
+ 
+    // 4. Subtrair do saldo
+    conta.saldo -= dados.valor
+ 
+    // 5. Registrar no extrato
+    conta.extrato.push({ tipo: 'saque', valor: dados.valor, data: new Date() })
+ 
+    return true
 }
 
 function transferir(dados: ITransferir): boolean {
-    const origem = contas.find(c => c.id === dados.contaOrigemId);
-    const destino = contas.find(c => c.id === dados.contaDestinoId);
-    if (!origem || !destino || !origem.ativa || !destino.ativa) return false;
-    if (dados.valor > 5000) return false;
-    const taxa = origem.banco !== destino.banco ? 2.5 : 0;
-    if (origem.saldo < dados.valor + taxa) return false;
-    origem.saldo -= dados.valor + taxa;
-    destino.saldo += dados.valor;
-    origem.extrato.push({ tipo: 'transferencia_enviada', valor: dados.valor, data: new Date() });
-    destino.extrato.push({ tipo: 'transferencia_recebida', valor: dados.valor, data: new Date() });
-    return true;
+    const LIMITE = 5000
+    const TAXA_OUTRO_BANCO = 2.50
+    // TODO: Implementar a lógica seguindo as regras de negócio
+    //
+    // Passos sugeridos:
+    
+    // 1. Buscar contas de origem e destino
+    const origem  = contas.find(c => c.id === dados.contaOrigemId)
+    const destino = contas.find(c => c.id === dados.contaDestinoId)
+ 
+    // 2. Verificar se ambas existem e estão ativas
+    if (!origem  || !origem.ativa)  return false
+    if (!destino || !destino.ativa) return false
+ 
+    // 3. Verificar limite por transação
+    if (dados.valor > LIMITE) return false
+ 
+    // 4. Calcular taxa (só se bancos diferentes)
+    const taxa = origem.banco !== destino.banco ? TAXA_OUTRO_BANCO : 0
+ 
+    // 5. Verificar se saldo cobre valor + taxa
+    if (dados.valor + taxa > origem.saldo) return false
+ 
+    // 6. Movimentar os saldos
+    origem.saldo  -= (dados.valor + taxa)
+    destino.saldo += dados.valor
+ 
+    // 7. Registrar no extrato de ambas
+    origem.extrato.push({ tipo: 'transferencia_enviada',   valor: dados.valor, data: new Date() })
+    destino.extrato.push({ tipo: 'transferencia_recebida', valor: dados.valor, data: new Date() })
+ 
+    return true
 }
 
 // ==================== FUNÇÕES AUXILIARES ====================
